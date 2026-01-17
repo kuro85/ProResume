@@ -1,4 +1,4 @@
-# resume
+# ProResume
 
 A clean, professional, ATS-friendly resume template built with LaTeX.
 
@@ -15,7 +15,7 @@ A clean, professional, ATS-friendly resume template built with LaTeX.
 
 - **ATS-friendly** — Clean structure, parseable by applicant tracking systems
 - **Auto-calculated tenure** — Durations like "3 years" or "2.5+ years" computed automatically
-- **Dynamic skill alignment** — Label column adjusts to fit longest category
+- **Dynamic skill alignment** — Label column adjusts to fit the longest category
 - **Modular structure** — Edit sections independently in separate files
 - **Hyperlinked contacts** — Clickable email, phone, and profile links
 - **Customizable** — Colors, fonts, and spacing defined as constants
@@ -23,8 +23,8 @@ A clean, professional, ATS-friendly resume template built with LaTeX.
 ## Quick Start
 
 ```bash
-git clone https://github.com/avmnu-sng/resume.git
-cd resume
+git clone https://github.com/avmnu-sng/ProResume.git
+cd ProResume
 xelatex resume.tex
 ```
 
@@ -91,7 +91,7 @@ Edit files in `resume/` folder. Each file has documentation at the top.
 Five built-in themes — set via class option in `resume.tex`:
 
 ```latex
-\documentclass{resume}              % classic (default)
+\documentclass[classic]{resume}              % classic (default)
 \documentclass[scholar]{resume}     % scholar
 \documentclass[modern]{resume}      % modern
 \documentclass[silicon]{resume}     % silicon
@@ -106,7 +106,7 @@ Five built-in themes — set via class option in `resume.tex`:
 | **silicon** | Roboto | Roboto Slab | Tech, contemporary |
 | **harmony** | Source Sans 3 | Source Serif 4 | Balanced, professional |
 
-See sample PDFs in [`samples/`](samples/) folder. All fonts included in `fonts/`.
+See sample PDFs in [`samples/`](samples/) folder. All fonts are included in `fonts/`.
 
 ## Troubleshooting
 
