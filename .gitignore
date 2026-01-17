@@ -1,0 +1,44 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.pdfsync
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+*.blg
+*.bbl
+
+# XeLaTeX specific
+*.xdv
+
+# Build output
+*.pdf
+
+# Allow sample PDFs
+!samples/*.pdf
+
+# Backup files
+*.bak
+*~
+
+# Editor files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

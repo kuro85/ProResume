@@ -1,0 +1,82 @@
+% =============================================================================
+% EXPERIENCE — Work History
+% =============================================================================
+%
+% List your work experience in reverse chronological order (most recent first).
+%
+% Usage: \expentry{Company}{Title}{Location}{StartDate}{EndDate}{Tagline}{Bullets}
+%   - Company:   Employer name (rendered uppercase, bold)
+%   - Title:     Your job title (rendered uppercase)
+%   - Location:  City, State/Country
+%   - StartDate: YYYY-MM format (e.g., 2022-01)
+%   - EndDate:   YYYY-MM format or "present" for current role
+%   - Tagline:   Brief role description (use {} to omit)
+%   - Bullets:   Achievement list using \item
+%
+% Notes:
+%   - Duration auto-formats as "Jan 2022 – Present (3 years)"
+%   - Use \begin{expsubentry}...\end{expsubentry} for nested bullets
+%   - Use \% for percent signs (e.g., "reduced costs by 70\%")
+%
+% =============================================================================
+
+\cvsection{Experience}
+
+\begin{experience}
+  \expentry
+    {Company A}
+    {Staff Software Engineer}
+    {San Francisco, CA}
+    {2021-03}
+    {present}
+    {Technical lead for the data platform team, owning ingestion pipelines and real-time analytics infrastructure}
+    {
+      \item Redesigned event streaming architecture to handle 500k events/sec with 99.99\% uptime
+      \item Reduced cloud infrastructure costs by 45\% through resource optimization and reserved capacity planning
+        \begin{expsubentry}
+          \item Consolidated redundant services and implemented auto-scaling policies
+          \item Migrated batch workloads to spot instances with checkpointing
+        \end{expsubentry}
+      \item Built internal developer platform for self-service data pipeline deployment
+      \item Led cross-functional initiative to improve system observability and reduce MTTR by 60\%
+    }
+
+  \expentry
+    {Company B}
+    {Senior Software Engineer}
+    {Seattle, WA}
+    {2018-06}
+    {2021-02}
+    {}
+    {
+      \item Designed and implemented distributed task scheduler processing 10M jobs daily
+      \item Architected migration from monolith to microservices, reducing deployment time from hours to minutes
+      \item Mentored junior engineers and established code review practices for the team
+      \item Created comprehensive runbooks and on-call documentation improving incident response
+    }
+
+  \expentry
+    {Company C}
+    {Software Engineer}
+    {Austin, TX}
+    {2015-08}
+    {2018-05}
+    {}
+    {
+      \item Built RESTful APIs serving 50M requests/day with p99 latency under 100ms
+      \item Implemented caching layer reducing database load by 70\%
+      \item Developed CI/CD pipelines automating deployment across multiple environments
+    }
+
+  \expentry
+    {Company C}
+    {Junior Software Engineer}
+    {Austin, TX}
+    {2013-07}
+    {2015-07}
+    {}
+    {
+      \item Developed internal tools for data processing and reporting workflows
+      \item Wrote integration tests improving code coverage from 40\% to 85\%
+    }
+\end{experience}

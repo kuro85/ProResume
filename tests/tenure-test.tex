@@ -1,0 +1,343 @@
+% =============================================================================
+% tenure-test.tex — Unit Tests for Tenure Calculation
+% =============================================================================
+%
+% Run:    cd tests && xelatex tenure-test.tex
+% Output: Plain text results to stdout (for CI integration)
+% Exit:   Code 1 on failure, 0 on success
+%
+% =============================================================================
+
+\documentclass{minimal}
+\usepackage{expl3}
+
+% Load the tenure module directly (not the full resume class)
+\input{../resume-tenure.code.tex}
+
+\ExplSyntaxOn
+
+% -----------------------------------------------------------------------------
+% Test Framework
+% -----------------------------------------------------------------------------
+\int_new:N \g__test_pass_int
+\int_new:N \g__test_fail_int
+\int_new:N \g__test_total_int
+\str_new:N \l__test_actual_str
+\str_new:N \l__test_expected_str
+
+% Start a test section
+\NewDocumentCommand{\testsection}{ m }{
+  \iow_term:n { }
+  \iow_term:n { ==~#1~== }
+}
+
+% Log present date header
+\NewDocumentCommand{\presentheader}{ m }{
+  \iow_term:n { }
+  \iow_term:n { ============================================== }
+  \iow_term:x { PRESENT~DATE:~#1 }
+  \iow_term:n { ============================================== }
+}
+
+% Assert tenure calculation matches expected value
+% #1 = start date, #2 = end date, #3 = expected tenure string
+\NewDocumentCommand{\asserttenure}{ m m m }{
+  \int_gincr:N \g__test_total_int
+  \__tenure_calc:nn { #1 } { #2 }
+  \str_set:Nx \l__test_actual_str { \tl_to_str:N \g__tenure_result_tl }
+  \str_set:Nn \l__test_expected_str { #3 }
+  \str_if_eq:NNTF \l__test_actual_str \l__test_expected_str {
+    \int_gincr:N \g__test_pass_int
+    \iow_term:x { PASS:~#1~to~#2~=>~"#3" }
+  } {
+    \int_gincr:N \g__test_fail_int
+    \iow_term:x { FAIL:~#1~to~#2 }
+    \iow_term:x { ~~expected:~"#3" }
+    \iow_term:x { ~~actual:~~"\str_use:N \l__test_actual_str" }
+  }
+}
+
+% Print test summary
+\NewDocumentCommand{\testsummary}{}{
+  \iow_term:n { }
+  \iow_term:n { ========================================== }
+  \iow_term:x { Test~Summary:~\int_use:N \g__test_pass_int /\int_use:N \g__test_total_int ~passed,~\int_use:N \g__test_fail_int ~failed }
+  \iow_term:n { ========================================== }
+  \int_compare:nNnTF { \g__test_fail_int } > { 0 } {
+    \iow_term:n { TESTS~FAILED }
+    \msg_fatal:nn { tenure-test } { tests-failed }
+  } {
+    \iow_term:n { ALL~TESTS~PASSED }
+  }
+}
+
+\msg_new:nnn { tenure-test } { tests-failed } {
+  \int_use:N \g__test_fail_int ~test(s)~failed.~See~output~above~for~details.
+}
+
+\ExplSyntaxOff
+
+\begin{document}
+
+% =============================================================================
+% PRESENT DATE: 2026-01 (Jan 2026)
+% =============================================================================
+\presentheader{2026-01 (Jan 2026)}
+\setpresentdate{2026}{1}
+
+\testsection{Less than 1 month}
+\asserttenure{2024-01}{2024-01}{< 1 month}
+
+\testsection{Exact quarter months}
+\asserttenure{2024-01}{2024-02}{1 month}
+\asserttenure{2024-01}{2024-03}{2 months}
+\asserttenure{2024-01}{2024-04}{3 months}
+\asserttenure{2024-01}{2024-07}{6 months}
+\asserttenure{2024-01}{2024-10}{9 months}
+
+\testsection{Non-exact quarter months (X+)}
+\asserttenure{2024-01}{2024-05}{4+ months}
+\asserttenure{2024-01}{2024-06}{5+ months}
+\asserttenure{2024-01}{2024-08}{7+ months}
+\asserttenure{2024-01}{2024-09}{8+ months}
+\asserttenure{2024-01}{2024-11}{10+ months}
+\asserttenure{2024-01}{2024-12}{11+ months}
+
+\testsection{Exact years}
+\asserttenure{2024-01}{2025-01}{1 year}
+\asserttenure{2024-01}{2026-01}{2 years}
+\asserttenure{2024-01}{2027-01}{3 years}
+\asserttenure{2024-01}{2029-01}{5 years}
+\asserttenure{2024-01}{2034-01}{10 years}
+
+\testsection{Exact quarters}
+\asserttenure{2024-01}{2025-04}{1.25 years}
+\asserttenure{2024-01}{2025-07}{1.5 years}
+\asserttenure{2024-01}{2025-10}{1.75 years}
+\asserttenure{2024-01}{2026-04}{2.25 years}
+\asserttenure{2024-01}{2026-07}{2.5 years}
+\asserttenure{2024-01}{2026-10}{2.75 years}
+
+\testsection{Non-exact quarters (X+ years)}
+\asserttenure{2024-01}{2025-02}{1+ years}
+\asserttenure{2024-01}{2025-03}{1+ years}
+\asserttenure{2024-01}{2025-05}{1.25+ years}
+\asserttenure{2024-01}{2025-06}{1.25+ years}
+\asserttenure{2024-01}{2025-08}{1.5+ years}
+\asserttenure{2024-01}{2025-09}{1.5+ years}
+\asserttenure{2024-01}{2025-11}{1.75+ years}
+\asserttenure{2024-01}{2025-12}{1.75+ years}
+\asserttenure{2024-01}{2026-02}{2+ years}
+\asserttenure{2024-01}{2026-03}{2+ years}
+
+\testsection{Real resume examples}
+\asserttenure{2019-06}{2021-12}{2.5 years}
+\asserttenure{2016-07}{2019-05}{2.75+ years}
+\asserttenure{2013-07}{2016-06}{2.75+ years}
+
+\testsection{Present-relative (2026-01)}
+\asserttenure{2022-01}{present}{4 years}
+\asserttenure{2025-01}{present}{1 year}
+\asserttenure{2025-07}{present}{6 months}
+\asserttenure{2025-10}{present}{3 months}
+\asserttenure{2025-12}{present}{1 month}
+\asserttenure{2026-01}{present}{< 1 month}
+
+% =============================================================================
+% PRESENT DATE: 2025-06 (Jun 2025)
+% =============================================================================
+\presentheader{2025-06 (Jun 2025)}
+\setpresentdate{2025}{6}
+
+\testsection{Less than 1 month}
+\asserttenure{2024-01}{2024-01}{< 1 month}
+
+\testsection{Exact quarter months}
+\asserttenure{2024-01}{2024-02}{1 month}
+\asserttenure{2024-01}{2024-03}{2 months}
+\asserttenure{2024-01}{2024-04}{3 months}
+\asserttenure{2024-01}{2024-07}{6 months}
+\asserttenure{2024-01}{2024-10}{9 months}
+
+\testsection{Non-exact quarter months (X+)}
+\asserttenure{2024-01}{2024-05}{4+ months}
+\asserttenure{2024-01}{2024-06}{5+ months}
+\asserttenure{2024-01}{2024-08}{7+ months}
+\asserttenure{2024-01}{2024-09}{8+ months}
+\asserttenure{2024-01}{2024-11}{10+ months}
+\asserttenure{2024-01}{2024-12}{11+ months}
+
+\testsection{Exact years}
+\asserttenure{2024-01}{2025-01}{1 year}
+\asserttenure{2024-01}{2026-01}{2 years}
+\asserttenure{2024-01}{2027-01}{3 years}
+\asserttenure{2024-01}{2029-01}{5 years}
+\asserttenure{2024-01}{2034-01}{10 years}
+
+\testsection{Exact quarters}
+\asserttenure{2024-01}{2025-04}{1.25 years}
+\asserttenure{2024-01}{2025-07}{1.5 years}
+\asserttenure{2024-01}{2025-10}{1.75 years}
+\asserttenure{2024-01}{2026-04}{2.25 years}
+\asserttenure{2024-01}{2026-07}{2.5 years}
+\asserttenure{2024-01}{2026-10}{2.75 years}
+
+\testsection{Non-exact quarters (X+ years)}
+\asserttenure{2024-01}{2025-02}{1+ years}
+\asserttenure{2024-01}{2025-03}{1+ years}
+\asserttenure{2024-01}{2025-05}{1.25+ years}
+\asserttenure{2024-01}{2025-06}{1.25+ years}
+\asserttenure{2024-01}{2025-08}{1.5+ years}
+\asserttenure{2024-01}{2025-09}{1.5+ years}
+\asserttenure{2024-01}{2025-11}{1.75+ years}
+\asserttenure{2024-01}{2025-12}{1.75+ years}
+\asserttenure{2024-01}{2026-02}{2+ years}
+\asserttenure{2024-01}{2026-03}{2+ years}
+
+\testsection{Real resume examples}
+\asserttenure{2019-06}{2021-12}{2.5 years}
+\asserttenure{2016-07}{2019-05}{2.75+ years}
+\asserttenure{2013-07}{2016-06}{2.75+ years}
+
+\testsection{Present-relative (2025-06)}
+\asserttenure{2022-01}{present}{3.25+ years}
+\asserttenure{2024-01}{present}{1.25+ years}
+\asserttenure{2024-06}{present}{1 year}
+\asserttenure{2024-12}{present}{6 months}
+\asserttenure{2025-03}{present}{3 months}
+\asserttenure{2025-06}{present}{< 1 month}
+
+% =============================================================================
+% PRESENT DATE: 2024-12 (Dec 2024)
+% =============================================================================
+\presentheader{2024-12 (Dec 2024)}
+\setpresentdate{2024}{12}
+
+\testsection{Less than 1 month}
+\asserttenure{2024-01}{2024-01}{< 1 month}
+
+\testsection{Exact quarter months}
+\asserttenure{2024-01}{2024-02}{1 month}
+\asserttenure{2024-01}{2024-03}{2 months}
+\asserttenure{2024-01}{2024-04}{3 months}
+\asserttenure{2024-01}{2024-07}{6 months}
+\asserttenure{2024-01}{2024-10}{9 months}
+
+\testsection{Non-exact quarter months (X+)}
+\asserttenure{2024-01}{2024-05}{4+ months}
+\asserttenure{2024-01}{2024-06}{5+ months}
+\asserttenure{2024-01}{2024-08}{7+ months}
+\asserttenure{2024-01}{2024-09}{8+ months}
+\asserttenure{2024-01}{2024-11}{10+ months}
+\asserttenure{2024-01}{2024-12}{11+ months}
+
+\testsection{Exact years}
+\asserttenure{2024-01}{2025-01}{1 year}
+\asserttenure{2024-01}{2026-01}{2 years}
+\asserttenure{2024-01}{2027-01}{3 years}
+\asserttenure{2024-01}{2029-01}{5 years}
+\asserttenure{2024-01}{2034-01}{10 years}
+
+\testsection{Exact quarters}
+\asserttenure{2024-01}{2025-04}{1.25 years}
+\asserttenure{2024-01}{2025-07}{1.5 years}
+\asserttenure{2024-01}{2025-10}{1.75 years}
+\asserttenure{2024-01}{2026-04}{2.25 years}
+\asserttenure{2024-01}{2026-07}{2.5 years}
+\asserttenure{2024-01}{2026-10}{2.75 years}
+
+\testsection{Non-exact quarters (X+ years)}
+\asserttenure{2024-01}{2025-02}{1+ years}
+\asserttenure{2024-01}{2025-03}{1+ years}
+\asserttenure{2024-01}{2025-05}{1.25+ years}
+\asserttenure{2024-01}{2025-06}{1.25+ years}
+\asserttenure{2024-01}{2025-08}{1.5+ years}
+\asserttenure{2024-01}{2025-09}{1.5+ years}
+\asserttenure{2024-01}{2025-11}{1.75+ years}
+\asserttenure{2024-01}{2025-12}{1.75+ years}
+\asserttenure{2024-01}{2026-02}{2+ years}
+\asserttenure{2024-01}{2026-03}{2+ years}
+
+\testsection{Real resume examples}
+\asserttenure{2019-06}{2021-12}{2.5 years}
+\asserttenure{2016-07}{2019-05}{2.75+ years}
+\asserttenure{2013-07}{2016-06}{2.75+ years}
+
+\testsection{Present-relative (2024-12)}
+\asserttenure{2022-01}{present}{2.75+ years}
+\asserttenure{2023-01}{present}{1.75+ years}
+\asserttenure{2023-12}{present}{1 year}
+\asserttenure{2024-06}{present}{6 months}
+\asserttenure{2024-09}{present}{3 months}
+\asserttenure{2024-11}{present}{1 month}
+
+% =============================================================================
+% PRESENT DATE: 2027-07 (Jul 2027)
+% =============================================================================
+\presentheader{2027-07 (Jul 2027)}
+\setpresentdate{2027}{7}
+
+\testsection{Less than 1 month}
+\asserttenure{2024-01}{2024-01}{< 1 month}
+
+\testsection{Exact quarter months}
+\asserttenure{2024-01}{2024-02}{1 month}
+\asserttenure{2024-01}{2024-03}{2 months}
+\asserttenure{2024-01}{2024-04}{3 months}
+\asserttenure{2024-01}{2024-07}{6 months}
+\asserttenure{2024-01}{2024-10}{9 months}
+
+\testsection{Non-exact quarter months (X+)}
+\asserttenure{2024-01}{2024-05}{4+ months}
+\asserttenure{2024-01}{2024-06}{5+ months}
+\asserttenure{2024-01}{2024-08}{7+ months}
+\asserttenure{2024-01}{2024-09}{8+ months}
+\asserttenure{2024-01}{2024-11}{10+ months}
+\asserttenure{2024-01}{2024-12}{11+ months}
+
+\testsection{Exact years}
+\asserttenure{2024-01}{2025-01}{1 year}
+\asserttenure{2024-01}{2026-01}{2 years}
+\asserttenure{2024-01}{2027-01}{3 years}
+\asserttenure{2024-01}{2029-01}{5 years}
+\asserttenure{2024-01}{2034-01}{10 years}
+
+\testsection{Exact quarters}
+\asserttenure{2024-01}{2025-04}{1.25 years}
+\asserttenure{2024-01}{2025-07}{1.5 years}
+\asserttenure{2024-01}{2025-10}{1.75 years}
+\asserttenure{2024-01}{2026-04}{2.25 years}
+\asserttenure{2024-01}{2026-07}{2.5 years}
+\asserttenure{2024-01}{2026-10}{2.75 years}
+
+\testsection{Non-exact quarters (X+ years)}
+\asserttenure{2024-01}{2025-02}{1+ years}
+\asserttenure{2024-01}{2025-03}{1+ years}
+\asserttenure{2024-01}{2025-05}{1.25+ years}
+\asserttenure{2024-01}{2025-06}{1.25+ years}
+\asserttenure{2024-01}{2025-08}{1.5+ years}
+\asserttenure{2024-01}{2025-09}{1.5+ years}
+\asserttenure{2024-01}{2025-11}{1.75+ years}
+\asserttenure{2024-01}{2025-12}{1.75+ years}
+\asserttenure{2024-01}{2026-02}{2+ years}
+\asserttenure{2024-01}{2026-03}{2+ years}
+
+\testsection{Real resume examples}
+\asserttenure{2019-06}{2021-12}{2.5 years}
+\asserttenure{2016-07}{2019-05}{2.75+ years}
+\asserttenure{2013-07}{2016-06}{2.75+ years}
+
+\testsection{Present-relative (2027-07)}
+\asserttenure{2022-01}{present}{5.5 years}
+\asserttenure{2022-07}{present}{5 years}
+\asserttenure{2025-01}{present}{2.5 years}
+\asserttenure{2026-07}{present}{1 year}
+\asserttenure{2027-01}{present}{6 months}
+\asserttenure{2027-04}{present}{3 months}
+
+\testsummary
+
+% Output minimal content to avoid "No pages of output" error
+\mbox{}
+
+\end{document}

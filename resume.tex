@@ -1,0 +1,50 @@
+% =============================================================================
+% resume.tex — Main Resume Document
+% =============================================================================
+%
+% QUICK START:
+%   1. Edit files in the resume/ folder with your information
+%   2. Build with: xelatex resume.tex
+%   3. Output: resume.pdf
+%
+% STRUCTURE:
+%   resume/header.tex        — Name, contact info, links, summary
+%   resume/skills.tex        — Technical skills by category
+%   resume/experience.tex    — Work history with achievements
+%   resume/certifications.tex— Professional certifications (optional)
+%   resume/awards.tex        — Awards and recognition (optional)
+%   resume/education.tex     — Educational background
+%
+% CUSTOMIZATION:
+%   - To remove a section, comment out its \input line below
+%   - To reorder sections, change the order of \input lines
+%   - To customize colors/fonts/spacing, edit resume.cls
+%
+% =============================================================================
+
+\documentclass[classic]{resume}
+
+% Load header data (name, contact, summary) before document begins
+\input{resume/header}
+
+\begin{document}
+
+% Render the header (name, contact info, links, summary)
+\makeheader
+
+% Skills section — technical competencies grouped by category
+\input{resume/skills}
+
+% Experience section — work history with achievements
+\input{resume/experience}
+
+% Certifications section — professional credentials (remove if not needed)
+\input{resume/certifications}
+
+% Awards section — recognition and honors (remove if not needed)
+\input{resume/awards}
+
+% Education section — degrees and academic background
+\input{resume/education}
+
+\end{document}

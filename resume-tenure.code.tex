@@ -1,0 +1,202 @@
+% =============================================================================
+% resume-tenure.code.tex — Tenure Calculation Module
+% =============================================================================
+%
+% Calculates and formats work duration (e.g., "3 years", "2.5+ years").
+% Loaded by resume.cls. Can be tested independently via tests/tenure-test.tex.
+%
+% Public commands:
+%   \formatduration{YYYY-MM}{YYYY-MM|present}  — Format date range with tenure
+%   \setpresentdate{YYYY}{MM}                  — Set fixed "present" date (for testing)
+%
+% =============================================================================
+
+\ExplSyntaxOn
+
+% -----------------------------------------------------------------------------
+% Configuration: "Present" date for tenure calculations
+% -----------------------------------------------------------------------------
+% Default: use actual current date
+% For testing: set to a fixed value with \setpresentdate{YYYY}{MM}
+
+\int_new:N \g__tenure_present_year_int
+\int_new:N \g__tenure_present_month_int
+
+% Initialize with current date (can be overridden)
+\int_gset:Nn \g__tenure_present_year_int { \c_sys_year_int }
+\int_gset:Nn \g__tenure_present_month_int { \c_sys_month_int }
+
+% Command to set fixed "present" date (for testing)
+\NewDocumentCommand{\setpresentdate}{ m m }{
+  \int_gset:Nn \g__tenure_present_year_int { #1 }
+  \int_gset:Nn \g__tenure_present_month_int { #2 }
+}
+
+% -----------------------------------------------------------------------------
+% Internal Variables
+% -----------------------------------------------------------------------------
+\int_new:N \l__tenure_start_year_int
+\int_new:N \l__tenure_start_month_int
+\int_new:N \l__tenure_end_year_int
+\int_new:N \l__tenure_end_month_int
+\int_new:N \l__tenure_total_months_int
+\int_new:N \l__tenure_quarters_int
+\int_new:N \l__tenure_remainder_int
+\int_new:N \l__tenure_years_int
+\int_new:N \l__tenure_rem_quarters_int
+\seq_new:N \l__tenure_date_seq
+\tl_new:N \g__tenure_result_tl
+
+% -----------------------------------------------------------------------------
+% Month name lookup
+% -----------------------------------------------------------------------------
+\cs_new:Npn \__tenure_month_name:n #1 {
+  \int_case:nn { #1 } {
+    { 1 } { Jan }
+    { 2 } { Feb }
+    { 3 } { Mar }
+    { 4 } { Apr }
+    { 5 } { May }
+    { 6 } { Jun }
+    { 7 } { Jul }
+    { 8 } { Aug }
+    { 9 } { Sep }
+    { 10 } { Oct }
+    { 11 } { Nov }
+    { 12 } { Dec }
+  }
+}
+
+% -----------------------------------------------------------------------------
+% Format date from YYYY-MM to "Mon YYYY"
+% -----------------------------------------------------------------------------
+\cs_new:Npn \__tenure_format_date:n #1 {
+  \regex_extract_once:nnNTF { \A (\d{4}) \- (\d{1,2}) \Z } { #1 } \l__tenure_date_seq {
+    \__tenure_month_name:n { \seq_item:Nn \l__tenure_date_seq { 3 } }
+    \c_space_tl
+    \seq_item:Nn \l__tenure_date_seq { 2 }
+  } {
+    #1
+  }
+}
+
+% -----------------------------------------------------------------------------
+% Calculate tenure string
+% #1 = start date (YYYY-MM), #2 = end date (YYYY-MM or "present")
+% Result stored in \g__tenure_result_tl
+% -----------------------------------------------------------------------------
+\cs_new:Npn \__tenure_calc:nn #1 #2 {
+  % Parse start date
+  \regex_extract_once:nnN { \A (\d{4}) \- (\d{1,2}) \Z } { #1 } \l__tenure_date_seq
+  \int_set:Nn \l__tenure_start_year_int { \seq_item:Nn \l__tenure_date_seq { 2 } }
+  \int_set:Nn \l__tenure_start_month_int { \seq_item:Nn \l__tenure_date_seq { 3 } }
+
+  % Parse end date or use configured "present" date
+  \str_if_eq:nnTF { #2 } { present } {
+    \int_set:Nn \l__tenure_end_year_int { \g__tenure_present_year_int }
+    \int_set:Nn \l__tenure_end_month_int { \g__tenure_present_month_int }
+  } {
+    \regex_extract_once:nnN { \A (\d{4}) \- (\d{1,2}) \Z } { #2 } \l__tenure_date_seq
+    \int_set:Nn \l__tenure_end_year_int { \seq_item:Nn \l__tenure_date_seq { 2 } }
+    \int_set:Nn \l__tenure_end_month_int { \seq_item:Nn \l__tenure_date_seq { 3 } }
+  }
+
+  % Calculate total months
+  \int_set:Nn \l__tenure_total_months_int {
+    (\l__tenure_end_year_int - \l__tenure_start_year_int) * 12
+    + \l__tenure_end_month_int - \l__tenure_start_month_int
+  }
+
+  % Calculate quarters (floor)
+  \int_set:Nn \l__tenure_quarters_int { \int_div_truncate:nn { \l__tenure_total_months_int } { 3 } }
+
+  % Check if exact quarter
+  \int_set:Nn \l__tenure_remainder_int { \int_mod:nn { \l__tenure_total_months_int } { 3 } }
+
+  % Format as years.quarters
+  \int_set:Nn \l__tenure_years_int { \int_div_truncate:nn { \l__tenure_quarters_int } { 4 } }
+  \int_set:Nn \l__tenure_rem_quarters_int { \int_mod:nn { \l__tenure_quarters_int } { 4 } }
+
+  % Build tenure string
+  \tl_gclear:N \g__tenure_result_tl
+  \int_compare:nNnTF { \l__tenure_total_months_int } < { 1 } {
+    % Less than 1 month
+    \tl_gset:Nn \g__tenure_result_tl { < ~ 1 ~ month }
+  } {
+    \int_compare:nNnTF { \l__tenure_total_months_int } < { 12 } {
+      % 1-11 months: show as months with + suffix if not exact quarter
+      \tl_gset:Nx \g__tenure_result_tl { \int_use:N \l__tenure_total_months_int }
+      % Add + if past at least 1 quarter (3 months) and not on exact quarter
+      \int_compare:nNnT { \l__tenure_quarters_int } > { 0 } {
+        \int_compare:nNnF { \l__tenure_remainder_int } = { 0 } {
+          \tl_gput_right:Nn \g__tenure_result_tl { + }
+        }
+      }
+      \int_compare:nNnTF { \l__tenure_total_months_int } = { 1 } {
+        \tl_gput_right:Nn \g__tenure_result_tl { ~ month }
+      } {
+        \tl_gput_right:Nn \g__tenure_result_tl { ~ months }
+      }
+    } {
+      % 12+ months: show as quarterly years
+      \int_compare:nNnTF { \l__tenure_rem_quarters_int } = { 0 } {
+        \tl_gset:Nx \g__tenure_result_tl { \int_use:N \l__tenure_years_int }
+      } {
+        % Format quarter fractions without trailing zeros
+        \int_compare:nNnTF { \l__tenure_rem_quarters_int } = { 2 } {
+          \tl_gset:Nx \g__tenure_result_tl { \int_use:N \l__tenure_years_int .5 }
+        } {
+          \tl_gset:Nx \g__tenure_result_tl { \int_use:N \l__tenure_years_int . \int_eval:n { \l__tenure_rem_quarters_int * 25 } }
+        }
+      }
+      \int_compare:nNnF { \l__tenure_remainder_int } = { 0 } {
+        \tl_gput_right:Nn \g__tenure_result_tl { + }
+      }
+      % Add "year" or "years" - always plural except exactly 1 year
+      \bool_if:nTF {
+        \int_compare_p:nNn { \l__tenure_years_int } = { 1 } &&
+        \int_compare_p:nNn { \l__tenure_rem_quarters_int } = { 0 } &&
+        \int_compare_p:nNn { \l__tenure_remainder_int } = { 0 }
+      } {
+        \tl_gput_right:Nn \g__tenure_result_tl { ~ year }
+      } {
+        \tl_gput_right:Nn \g__tenure_result_tl { ~ years }
+      }
+    }
+  }
+}
+
+% -----------------------------------------------------------------------------
+% Public interface (aliased for resume.cls compatibility)
+% -----------------------------------------------------------------------------
+\cs_gset_eq:NN \__resume_calc_tenure:nn \__tenure_calc:nn
+\cs_gset_eq:NN \__resume_format_date:n \__tenure_format_date:n
+\tl_gset:Nn \g__resume_tenure_tl { }
+\cs_new:Npn \__tenure_sync_result: {
+  \tl_gset_eq:NN \g__resume_tenure_tl \g__tenure_result_tl
+}
+
+% Wrapper that syncs to old variable name
+\cs_gset:Npn \__resume_calc_tenure:nn #1 #2 {
+  \__tenure_calc:nn { #1 } { #2 }
+  \__tenure_sync_result:
+}
+
+% -----------------------------------------------------------------------------
+% Public command to format duration with tenure
+% #1 = start date (YYYY-MM), #2 = end date (YYYY-MM or "present")
+% -----------------------------------------------------------------------------
+\NewDocumentCommand{\formatduration}{ m m }{
+  \__tenure_format_date:n { #1 }
+  \c_space_tl \textendash \c_space_tl
+  \str_if_eq:nnTF { #2 } { present } {
+    Present
+  } {
+    \__tenure_format_date:n { #2 }
+  }
+  \c_space_tl
+  \__tenure_calc:nn { #1 } { #2 }
+  ( \g__tenure_result_tl )
+}
+
+\ExplSyntaxOff
